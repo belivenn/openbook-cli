@@ -1,0 +1,51 @@
+{
+  "name": "openbook-cli",
+  "version": "1.0.0",
+  "description": "A comprehensive CLI tool for interacting with OpenBook and Serum DEX markets on Solana",
+  "main": "dist/index.js",
+  "bin": {
+    "openbook-cli": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/index.ts",
+    "openbook": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "openbook",
+    "serum",
+    "solana",
+    "dex",
+    "trading",
+    "cli",
+    "blockchain",
+    "defi"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@project-serum/serum": "^0.13.65",
+    "@solana/spl-token": "^0.3.9",
+    "@solana/web3.js": "^1.87.6",
+    "bn.js": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@types/node": "^20.10.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/openbook-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/openbook-cli/issues"
+  },
+  "homepage": "https://github.com/yourusername/openbook-cli#readme"
+} 
