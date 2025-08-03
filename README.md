@@ -207,18 +207,3 @@ MIT License - see [LICENSE](LICENSE) file for details.
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/yourusername/openbook-cli/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/openbook-cli/discussions)
-
-## 🙏 Acknowledgments
-
-- [Serum SDK](https://github.com/project-serum/serum-ts) for market interactions
-- [Solana Web3.js](https://github.com/solana-labs/solana-web3.js) for blockchain connectivity
-- [OpenBook](https://openbookdex.com/) for the DEX protocol
-
----
-
-Made with ❤️ for the Solana ecosystem 
