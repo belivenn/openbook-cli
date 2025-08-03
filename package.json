@@ -1,10 +1,10 @@
 {
   "name": "openbook-cli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A comprehensive CLI tool for interacting with OpenBook and Serum DEX markets on Solana",
   "main": "dist/index.js",
   "bin": {
-    "openbook-cli": "./dist/cli.js"
+    "openbook-cli": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
@@ -26,6 +26,7 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
+    "@openbook-dex/openbook": "^0.0.9",
     "@project-serum/serum": "^0.13.65",
     "@solana/spl-token": "^0.3.9",
     "@solana/web3.js": "^1.87.6",
@@ -42,7 +43,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/belivenn/openbook-cli.git"
+    "url": "git+https://github.com/belivenn/openbook-cli.git"
   },
   "bugs": {
     "url": "https://github.com/belivenn/openbook-cli/issues"
