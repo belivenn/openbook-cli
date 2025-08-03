@@ -1,6 +1,6 @@
 {
   "name": "openbook-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A comprehensive CLI tool for interacting with OpenBook and Serum DEX markets on Solana",
   "main": "dist/index.js",
   "bin": {
@@ -48,4 +48,4 @@
     "url": "https://github.com/yourusername/openbook-cli/issues"
   },
   "homepage": "https://github.com/yourusername/openbook-cli#readme"
-} 
+}
