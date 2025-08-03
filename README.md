@@ -108,7 +108,7 @@ The CLI fetches live order book data directly from the blockchain:
 
 ### Setup
 ```bash
-git clone https://github.com/yourusername/openbook-cli.git
+git clone https://github.com/belivenn/openbook-cli.git
 cd openbook-cli
 npm install
 ```
