@@ -1,13 +1,8 @@
 import { Connection, PublicKey } from "@solana/web3.js";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Market } from "@project-serum/serum";
-
-// Market information
-// No default market - users must specify a market address
 
 // Program IDs
 const OPENBOOK_PROGRAM_ID = "srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX";
-const OPENBOOK_V2_PROGRAM_ID = "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb";
 const SERUM_PROGRAM_ID = "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin";
 
 // Connection to Solana
@@ -517,6 +512,7 @@ async function main() {
             console.log("🚀 OpenBook CLI - Command Line Interface");
             console.log("=" .repeat(60));
             console.log("\nUsage:");
+
             console.log("  openbook-cli <market_address>                       # Fetch market (auto-detects program)");
             console.log("  openbook-cli <market_address> --add                 # Add market (auto-detects program)");
             console.log("  openbook-cli --list                                 # List OpenBook markets");
@@ -531,8 +527,8 @@ async function main() {
             return;
         }
         
-        // Check if a market address was provided
-        if (!args[0] && !args.includes('--list') && !args.includes('-l') && !args.includes('--help') && !args.includes('-h')) {
+        // Check if market address is provided
+        if (!args[0]) {
             console.log("❌ Error: Market address is required");
             console.log("\nUsage:");
             console.log("  openbook-cli <market_address>                       # Fetch market (auto-detects program)");
@@ -612,6 +608,7 @@ async function main() {
         console.log("2. Direct blockchain order book fetching");
         console.log("3. Real bids and asks from the market");
         console.log("\nUsage:");
+
         console.log("  openbook-cli <market_address>                       # Fetch market (auto-detects program)");
         console.log("  openbook-cli <market_address> --add                 # Add market (auto-detects program)");
         console.log("  openbook-cli --list                                 # List OpenBook markets");
