@@ -299,20 +299,24 @@ async function displayOrderBook(marketAddress: string, depth: number = 10, useSe
         const { bids, asks } = await getRealOrderBook(marketAddress, depth, useSerum);
         
         console.log("\n🔴 ASKS (Sell Orders):");
-        console.log("Price\t\tSize");
+        console.log("Price           Size");
         console.log("-" .repeat(30));
         
         // Display asks in reverse order (highest price first)
         asks.slice().reverse().forEach((ask) => {
-            console.log(`${ask.price.toFixed(4)}\t\t${ask.size.toFixed(4)}`);
+            const priceStr = ask.price.toFixed(4);
+            const sizeStr = ask.size.toFixed(4);
+            console.log(`${priceStr.padEnd(15)}${sizeStr}`);
         });
         
         console.log("\n🟢 BIDS (Buy Orders):");
-        console.log("Price\t\tSize");
+        console.log("Price           Size");
         console.log("-" .repeat(30));
         
         bids.forEach((bid) => {
-            console.log(`${bid.price.toFixed(4)}\t\t${bid.size.toFixed(4)}`);
+            const priceStr = bid.price.toFixed(4);
+            const sizeStr = bid.size.toFixed(4);
+            console.log(`${priceStr.padEnd(15)}${sizeStr}`);
         });
         
         // Calculate market stats from the order book data we already have
@@ -501,7 +505,7 @@ function loadKnownMarketsFromFile(useSerum: boolean = false): void {
 // Main function to run the fetcher
 async function main() {
     try {
-        console.log("🚀 OpenBook Order Fetcher (Real Data)");
+        console.log("🚀 OpenBook Order Fetcher");
         console.log("=" .repeat(60));
         
         // Check if a specific market address was provided
@@ -537,8 +541,8 @@ async function main() {
             console.log("  openbook-cli --list --serum                         # List Serum markets");
             console.log("  openbook-cli --help                                 # Show this help");
             console.log("\nExamples:");
-            console.log("  openbook-cli Gc4tfUHRNnpVwvASfQD3q26G8GNmLYuz4KzB4QNkNuiQ");
-            console.log("  openbook-cli 8BnEgHoWFysVcuFFX7QztDmzuH8r5ZFvyJ3arACXenbx --add");
+            console.log("  openbook-cli 3ySaxSspDCsEM53zRTfpyr9s9yfq9yNpZFXSEbvbadLf");
+            console.log("  openbook-cli 3ySaxSspDCsEM53zRTfpyr9s9yfq9yNpZFXSEbvbadLf --add");
             return;
         }
         
