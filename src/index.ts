@@ -66,33 +66,7 @@ async function getTokenMetadata(mintAddress: string): Promise<TokenMetadata> {
         const parsedData = tokenInfo.value.data as any;
         const decimals = parsedData.parsed.info.decimals;
         
-        // Try to get Metaplex metadata
-        try {
-            const [metadataAddress] = PublicKey.findProgramAddressSync(
-                [
-                    Buffer.from("metadata"),
-                    new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s").toBuffer(),
-                    mintPubkey.toBuffer()
-                ],
-                new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s")
-            );
-            
-            const metadataAccount = await connection.getAccountInfo(metadataAddress);
-            
-            if (metadataAccount) {
-                // Parse Metaplex metadata
-                const metadata = JSON.parse(metadataAccount.data.toString());
-                return {
-                    symbol: metadata.data.symbol || "UNKNOWN",
-                    name: metadata.data.name || "Unknown Token",
-                    decimals: decimals
-                };
-            }
-        } catch (error) {
-            console.log(`No Metaplex metadata found for ${mintAddress}`);
-        }
-        
-        // Fallback: use mint address as symbol
+        // Simple fallback: use first 8 characters of mint address as symbol
         return {
             symbol: mintAddress.slice(0, 8),
             name: "Unknown Token",

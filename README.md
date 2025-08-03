@@ -85,19 +85,7 @@ You can find the exact location by running:
 npm list -g openbook-cli
 ```
 
-## 🎨 Token Symbol Resolution
 
-### Known Tokens
-Automatically recognizes common tokens:
-- **SOL**: `So11111111111111111111111111111111111111112`
-- **USDC**: `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`
-- **ATLAS**: `HjFijcGWKgfDwGpFX2rqFwEU9jtEgFuRQAJe1ERXFsA3`
-
-### Unknown Tokens
-For unknown tokens, the system:
-1. Attempts to fetch Metaplex metadata
-2. Falls back to first 8 characters of the mint address
-3. Displays as: `First8Chars` (e.g., `BV1soTdX`)
 
 ## 📈 Order Book Data
 
