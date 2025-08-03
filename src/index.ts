@@ -536,6 +536,27 @@ async function main() {
         
         // Check if a specific market address was provided
         const args = process.argv.slice(2);
+        
+        // Handle help flag
+        if (args.includes('--help') || args.includes('-h')) {
+            console.log("🚀 OpenBook CLI - Command Line Interface");
+            console.log("=" .repeat(60));
+            console.log("\nUsage:");
+            console.log("  openbook-cli                                        # Fetch default market");
+            console.log("  openbook-cli <market_address>                       # Fetch market (auto-detects program)");
+            console.log("  openbook-cli <market_address> --add                 # Add market (auto-detects program)");
+            console.log("  openbook-cli --list                                 # List OpenBook markets");
+            console.log("  openbook-cli --list --serum                         # List Serum markets");
+            console.log("\nAuto-detection:");
+            console.log("  The system automatically detects if a market is OpenBook or Serum");
+            console.log("  No need to specify --serum flag for most operations");
+            console.log("\nFiles:");
+            console.log("  Market files are stored in the CLI installation directory");
+            console.log("  known_openbook_markets.json                         # OpenBook markets");
+            console.log("  known_serum_markets.json                            # Serum markets");
+            return;
+        }
+        
         const targetMarket = args[0] || MARKET_ADDRESS;
         
         // Check for --serum flag first
@@ -611,6 +632,7 @@ async function main() {
         console.log("  The system automatically detects if a market is OpenBook or Serum");
         console.log("  No need to specify --serum flag for most operations");
         console.log("\nFiles:");
+        console.log("  Market files are stored in the CLI installation directory");
         console.log("  known_openbook_markets.json                         # OpenBook markets");
         console.log("  known_serum_markets.json                            # Serum markets");
         

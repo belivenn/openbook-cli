@@ -70,10 +70,20 @@ The CLI automatically detects whether a market belongs to OpenBook or Serum by c
 
 ## 📊 Data Storage
 
-The CLI maintains separate files for different market types:
+The CLI maintains separate files for different market types in the installation directory:
 
 - `known_openbook_markets.json` - OpenBook markets and token symbols
 - `known_serum_markets.json` - Serum markets and token symbols
+
+**File Location**: The market files are stored in the CLI's installation directory:
+```
+~/.nvm/versions/node/v24.2.0/lib/node_modules/openbook-cli/dist/
+```
+
+You can find the exact location by running:
+```bash
+npm list -g openbook-cli
+```
 
 ## 🎨 Token Symbol Resolution
 
@@ -149,6 +159,13 @@ openbook-cli --list
 
 # List Serum markets
 openbook-cli --list --serum
+```
+
+### Check Market Files Location
+```bash
+# Find where market files are stored
+npm list -g openbook-cli
+ls -la $(npm list -g openbook-cli | grep openbook-cli | awk '{print $2}')/dist/*.json
 ```
 
 ## 🔧 Configuration
