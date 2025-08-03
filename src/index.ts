@@ -13,7 +13,40 @@ function createPublicKey(address: string): PublicKey {
     try {
         return new PublicKey(address);
     } catch (error) {
-        throw new Error("Invalid public key input");
+        throw new Error("Invalid public key format");
+    }
+}
+
+// Helper function to show usage information
+function showUsage(): void {
+    console.log("\nUsage:");
+    console.log("  openbook-cli <market_address>                       # Fetch market (auto-detects program)");
+    console.log("  openbook-cli <market_address> --add                 # Add market (auto-detects program)");
+    console.log("  openbook-cli --list                                 # List OpenBook markets");
+    console.log("  openbook-cli --list --serum                         # List Serum markets");
+    console.log("  openbook-cli --help                                 # Show this help");
+    console.log("\nExamples:");
+    console.log("  openbook-cli 3ySaxSspDCsEM53zRTfpyr9s9yfq9yNpZFXSEbvbadLf");
+    console.log("  openbook-cli 3ySaxSspDCsEM53zRTfpyr9s9yfq9yNpZFXSEbvbadLf --add");
+    console.log("\nAuto-detection:");
+    console.log("  The system automatically detects if a market is OpenBook or Serum");
+    console.log("  No need to specify --serum flag for most operations");
+}
+
+// Helper function to check if an address is a valid market
+async function isValidMarket(marketAddress: string, useSerum: boolean = false): Promise<boolean> {
+    try {
+        const marketPubkey = createPublicKey(marketAddress);
+        const marketAccount = await connection.getAccountInfo(marketPubkey);
+        
+        if (!marketAccount) {
+            return false;
+        }
+        
+        const expectedProgramId = useSerum ? SERUM_PROGRAM_ID : OPENBOOK_PROGRAM_ID;
+        return marketAccount.owner.toString() === expectedProgramId;
+    } catch (error) {
+        return false;
     }
 }
 
@@ -134,8 +167,11 @@ async function getMarketInfo(marketAddress: string, useSerum: boolean = false): 
             };
         }
     } catch (error) {
-        console.error("Error fetching market info:", error);
-        throw error;
+        // Re-throw the error with better context
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error("Failed to fetch market info");
     }
 }
 
@@ -162,8 +198,11 @@ async function getMarketAccounts(marketAddress: string, useSerum: boolean = fals
         
         return marketAccount;
     } catch (error) {
-        console.error("Error fetching market accounts:", error);
-        throw error;
+        // Re-throw the error with better context
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error("Failed to fetch market accounts");
     }
 }
 
@@ -188,8 +227,19 @@ async function loadOpenBookMarket(marketAddress: string, useSerum: boolean = fal
         return market;
     } catch (error) {
         const programName = useSerum ? "Serum" : "OpenBook";
-        console.error(`Error loading ${programName} market:`, error);
-        throw error;
+        
+        // Check if it's a program ownership error
+        if (error instanceof Error && error.message.includes("Address not owned by program")) {
+            throw new Error(`Market not owned by ${programName} program`);
+        }
+        
+        // Check if it's a market not found error
+        if (error instanceof Error && error.message.includes("Market account not found")) {
+            throw new Error("Market account not found");
+        }
+        
+        // For other errors, provide a generic message
+        throw new Error(`Failed to load ${programName} market: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
 
@@ -236,8 +286,11 @@ async function getRealOrderBook(marketAddress: string, depth: number = 20, useSe
         return { bids: bidOrders, asks: askOrders };
         
     } catch (error) {
-        console.error("❌ Error fetching real order book:", error);
-        throw error;
+        // Re-throw the error with better context
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error("Failed to fetch order book");
     }
 }
 
@@ -343,7 +396,11 @@ async function displayOrderBook(marketAddress: string, depth: number = 10, useSe
         console.log(`Spread %: ${spreadPercentage?.toFixed(2) || 'N/A'}%`);
         
     } catch (error) {
-        console.error("Error displaying order book:", error);
+        if (error instanceof Error) {
+            console.error(`❌ Error: ${error.message}`);
+        } else {
+            console.error("❌ Error: Failed to display order book");
+        }
     }
 }
 
@@ -385,7 +442,11 @@ async function displayMarketInfo(marketAddress: string, useSerum: boolean = fals
         }
         
     } catch (error) {
-        console.error("Error displaying market info:", error);
+        if (error instanceof Error) {
+            console.error(`❌ Error: ${error.message}`);
+        } else {
+            console.error("❌ Error: Failed to display market info");
+        }
     }
 }
 
@@ -543,15 +604,7 @@ async function main() {
         // Check if market address is provided
         if (!args[0]) {
             console.log("❌ Error: Market address is required");
-            console.log("\nUsage:");
-            console.log("  openbook-cli <market_address>                       # Fetch market (auto-detects program)");
-            console.log("  openbook-cli <market_address> --add                 # Add market (auto-detects program)");
-            console.log("  openbook-cli --list                                 # List OpenBook markets");
-            console.log("  openbook-cli --list --serum                         # List Serum markets");
-            console.log("  openbook-cli --help                                 # Show this help");
-            console.log("\nExamples:");
-            console.log("  openbook-cli 3ySaxSspDCsEM53zRTfpyr9s9yfq9yNpZFXSEbvbadLf");
-            console.log("  openbook-cli 3ySaxSspDCsEM53zRTfpyr9s9yfq9yNpZFXSEbvbadLf --add");
+            showUsage();
             return;
         }
         
@@ -578,12 +631,27 @@ async function main() {
                     } else if (owner === OPENBOOK_PROGRAM_ID) {
                         useSerum = false;
                         detectedProgram = "OpenBook";
+                    } else {
+                        // The account exists but is not owned by OpenBook or Serum
+                        console.error("❌ Error: The provided address is not a valid market");
+                        console.error("   The address exists but is not owned by OpenBook or Serum programs");
+                        console.error("   Please provide a valid market address");
+                        showUsage();
+                        return;
                     }
                     console.log(`🔍 Auto-detected: ${detectedProgram} market`);
+                } else {
+                    // Account doesn't exist
+                    console.error("❌ Error: Market account not found");
+                    console.error("   The provided address does not exist on Solana");
+                    console.error("   Please provide a valid market address");
+                    showUsage();
+                    return;
                 }
             } catch (error) {
-                if (error instanceof Error && error.message === "Invalid public key input") {
-                    console.error("Error: Invalid public key input");
+                if (error instanceof Error && error.message === "Invalid public key format") {
+                    console.error("❌ Error: Invalid public key format. Please ensure it's a valid Solana address.");
+                    showUsage();
                     return;
                 }
                 console.log("ℹ️  Could not auto-detect program, using OpenBook as default");
@@ -613,23 +681,40 @@ async function main() {
                 console.log("\n✅ Market added successfully!");
                 return;
             } catch (error) {
-                if (error instanceof Error && error.message === "Invalid public key input") {
-                    console.error("Error: Invalid public key input");
+                if (error instanceof Error && error.message === "Invalid public key format") {
+                    console.error("❌ Error: Invalid public key format. Please ensure it's a valid Solana address.");
+                    showUsage();
                     return;
                 }
-                throw error;
+                if (error instanceof Error) {
+                    console.error(`❌ Error: ${error.message}`);
+                } else {
+                    console.error("❌ Error: Failed to add market");
+                }
+                return;
             }
         }
         
         // Display market information
         try {
+            // First check if the address is a valid market
+            const isValid = await isValidMarket(targetMarket, useSerum);
+            if (!isValid) {
+                console.error("❌ Error: The provided address is not a valid market");
+                console.error("   The address exists but is not owned by OpenBook or Serum programs");
+                console.error("   Please provide a valid market address");
+                showUsage();
+                return;
+            }
+            
             await displayMarketInfo(targetMarket, useSerum);
             
             // Display order book
             await displayOrderBook(targetMarket, 15, useSerum);
         } catch (error) {
-            if (error instanceof Error && error.message === "Invalid public key input") {
-                console.error("Error: Invalid public key input");
+            if (error instanceof Error && error.message === "Invalid public key format") {
+                console.error("❌ Error: Invalid public key format. Please ensure it's a valid Solana address.");
+                showUsage();
                 return;
             }
             throw error;
@@ -655,7 +740,11 @@ async function main() {
         console.log("  known_serum_markets.json                            # Serum markets");
         
     } catch (error) {
-        console.error("❌ Error in main function:", error);
+        if (error instanceof Error) {
+            console.error(`❌ Error: ${error.message}`);
+        } else {
+            console.error("❌ Error: An unexpected error occurred");
+        }
     }
 }
 
