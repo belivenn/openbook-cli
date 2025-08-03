@@ -8,6 +8,15 @@ const SERUM_PROGRAM_ID = "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin";
 // Connection to Solana
 const connection = new Connection("https://api.mainnet-beta.solana.com", "confirmed");
 
+// Helper function to safely create PublicKey instances
+function createPublicKey(address: string): PublicKey {
+    try {
+        return new PublicKey(address);
+    } catch (error) {
+        throw new Error("Invalid public key input");
+    }
+}
+
 interface OrderBookLevel {
     price: number;
     size: number;
@@ -40,7 +49,7 @@ let KNOWN_TOKEN_SYMBOLS: { [key: string]: string } = {};
 
 async function getTokenMetadata(mintAddress: string): Promise<TokenMetadata> {
     try {
-        const mintPubkey = new PublicKey(mintAddress);
+        const mintPubkey = createPublicKey(mintAddress);
         
         // First check if we have a known symbol
         const knownSymbol = KNOWN_TOKEN_SYMBOLS[mintAddress as keyof typeof KNOWN_TOKEN_SYMBOLS];
@@ -132,7 +141,7 @@ async function getMarketInfo(marketAddress: string, useSerum: boolean = false): 
 
 async function getMarketAccounts(marketAddress: string, useSerum: boolean = false) {
     try {
-        const marketPubkey = new PublicKey(marketAddress);
+        const marketPubkey = createPublicKey(marketAddress);
         const marketAccount = await connection.getAccountInfo(marketPubkey);
         
         if (!marketAccount) {
@@ -160,7 +169,7 @@ async function getMarketAccounts(marketAddress: string, useSerum: boolean = fals
 
 async function loadOpenBookMarket(marketAddress: string, useSerum: boolean = false): Promise<Market> {
     try {
-        const marketPubkey = new PublicKey(marketAddress);
+        const marketPubkey = createPublicKey(marketAddress);
         
         // Use the appropriate program ID based on mode
         const programId = useSerum ? SERUM_PROGRAM_ID : OPENBOOK_PROGRAM_ID;
@@ -170,7 +179,7 @@ async function loadOpenBookMarket(marketAddress: string, useSerum: boolean = fal
             connection,
             marketPubkey,
             {},
-            new PublicKey(programId)
+            createPublicKey(programId)
         );
         
         const programName = useSerum ? "Serum" : "OpenBook";
@@ -558,7 +567,7 @@ async function main() {
         // If a specific market is provided, try to detect its program
         if (args[0] && !args.includes('--list') && !args.includes('-l')) {
             try {
-                const marketPubkey = new PublicKey(targetMarket);
+                const marketPubkey = createPublicKey(targetMarket);
                 const marketAccount = await connection.getAccountInfo(marketPubkey);
                 
                 if (marketAccount) {
@@ -573,6 +582,10 @@ async function main() {
                     console.log(`🔍 Auto-detected: ${detectedProgram} market`);
                 }
             } catch (error) {
+                if (error instanceof Error && error.message === "Invalid public key input") {
+                    console.error("Error: Invalid public key input");
+                    return;
+                }
                 console.log("ℹ️  Could not auto-detect program, using OpenBook as default");
             }
         }
@@ -591,20 +604,36 @@ async function main() {
         // If --add flag is present and a market address is provided
         if (shouldAdd && args[0] && args[0] !== '--add' && args[0] !== '-a' && args[0] !== '--serum' && args[0] !== '-s') {
             console.log("➕ Adding market to known markets...");
-            await addMarketToKnownMarkets(targetMarket, useSerum);
-            
-            // Save to appropriate file
-            saveKnownMarketsToFile(useSerum);
-            
-            console.log("\n✅ Market added successfully!");
-            return;
+            try {
+                await addMarketToKnownMarkets(targetMarket, useSerum);
+                
+                // Save to appropriate file
+                saveKnownMarketsToFile(useSerum);
+                
+                console.log("\n✅ Market added successfully!");
+                return;
+            } catch (error) {
+                if (error instanceof Error && error.message === "Invalid public key input") {
+                    console.error("Error: Invalid public key input");
+                    return;
+                }
+                throw error;
+            }
         }
         
         // Display market information
-        await displayMarketInfo(targetMarket, useSerum);
-        
-        // Display order book
-        await displayOrderBook(targetMarket, 15, useSerum);
+        try {
+            await displayMarketInfo(targetMarket, useSerum);
+            
+            // Display order book
+            await displayOrderBook(targetMarket, 15, useSerum);
+        } catch (error) {
+            if (error instanceof Error && error.message === "Invalid public key input") {
+                console.error("Error: Invalid public key input");
+                return;
+            }
+            throw error;
+        }
         
         console.log("\n✅ Fetch completed successfully!");
         console.log("\n📝 Note: This implementation uses:");
