@@ -602,11 +602,11 @@ async function main() {
         console.log("2. Direct blockchain order book fetching");
         console.log("3. Real bids and asks from the market");
         console.log("\nUsage:");
-        console.log("  npm run openbook                                    # Fetch default market");
-        console.log("  npm run openbook <market_address>                   # Fetch market (auto-detects program)");
-        console.log("  npm run openbook <market_address> --add             # Add market (auto-detects program)");
-        console.log("  npm run openbook --list                             # List OpenBook markets");
-        console.log("  npm run openbook --list --serum                     # List Serum markets");
+        console.log("  openbook-cli                                        # Fetch default market");
+        console.log("  openbook-cli <market_address>                       # Fetch market (auto-detects program)");
+        console.log("  openbook-cli <market_address> --add                 # Add market (auto-detects program)");
+        console.log("  openbook-cli --list                                 # List OpenBook markets");
+        console.log("  openbook-cli --list --serum                         # List Serum markets");
         console.log("\nAuto-detection:");
         console.log("  The system automatically detects if a market is OpenBook or Serum");
         console.log("  No need to specify --serum flag for most operations");
