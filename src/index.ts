@@ -3,10 +3,11 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Market } from "@project-serum/serum";
 
 // Market information
-const MARKET_ADDRESS = "Cw35vJ7ecmnwc2jPumgfhDzUuJ1fmrytuRopBF5JUXrq";
+// No default market - users must specify a market address
 
 // Program IDs
 const OPENBOOK_PROGRAM_ID = "srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX";
+const OPENBOOK_V2_PROGRAM_ID = "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb";
 const SERUM_PROGRAM_ID = "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin";
 
 // Connection to Solana
@@ -516,7 +517,6 @@ async function main() {
             console.log("🚀 OpenBook CLI - Command Line Interface");
             console.log("=" .repeat(60));
             console.log("\nUsage:");
-            console.log("  openbook-cli                                        # Fetch default market");
             console.log("  openbook-cli <market_address>                       # Fetch market (auto-detects program)");
             console.log("  openbook-cli <market_address> --add                 # Add market (auto-detects program)");
             console.log("  openbook-cli --list                                 # List OpenBook markets");
@@ -531,7 +531,22 @@ async function main() {
             return;
         }
         
-        const targetMarket = args[0] || MARKET_ADDRESS;
+        // Check if a market address was provided
+        if (!args[0] && !args.includes('--list') && !args.includes('-l') && !args.includes('--help') && !args.includes('-h')) {
+            console.log("❌ Error: Market address is required");
+            console.log("\nUsage:");
+            console.log("  openbook-cli <market_address>                       # Fetch market (auto-detects program)");
+            console.log("  openbook-cli <market_address> --add                 # Add market (auto-detects program)");
+            console.log("  openbook-cli --list                                 # List OpenBook markets");
+            console.log("  openbook-cli --list --serum                         # List Serum markets");
+            console.log("  openbook-cli --help                                 # Show this help");
+            console.log("\nExamples:");
+            console.log("  openbook-cli Gc4tfUHRNnpVwvASfQD3q26G8GNmLYuz4KzB4QNkNuiQ");
+            console.log("  openbook-cli 8BnEgHoWFysVcuFFX7QztDmzuH8r5ZFvyJ3arACXenbx --add");
+            return;
+        }
+        
+        const targetMarket = args[0];
         
         // Check for --serum flag first
         const useSerumFlag = args.includes('--serum') || args.includes('-s');
@@ -597,7 +612,6 @@ async function main() {
         console.log("2. Direct blockchain order book fetching");
         console.log("3. Real bids and asks from the market");
         console.log("\nUsage:");
-        console.log("  openbook-cli                                        # Fetch default market");
         console.log("  openbook-cli <market_address>                       # Fetch market (auto-detects program)");
         console.log("  openbook-cli <market_address> --add                 # Add market (auto-detects program)");
         console.log("  openbook-cli --list                                 # List OpenBook markets");
