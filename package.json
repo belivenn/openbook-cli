@@ -25,10 +25,13 @@
   ],
   "author": "Your Name",
   "license": "MIT",
+  "overrides": {
+    "safe-buffer": "npm:@socketregistry/safe-buffer@1.0.8"
+  },
   "dependencies": {
     "@openbook-dex/openbook": "^0.0.9",
     "@project-serum/serum": "^0.13.65",
-    "@solana/spl-token": "^0.3.9",
+    "@solana/spl-token": "^0.4.13",
     "@solana/web3.js": "^1.87.6",
     "bn.js": "^5.2.1"
   },
