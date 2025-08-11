@@ -1,6 +1,6 @@
 {
   "name": "openbook-cli",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "A comprehensive CLI tool for interacting with OpenBook and Serum DEX markets on Solana",
   "main": "dist/index.js",
   "bin": {

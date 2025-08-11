@@ -642,17 +642,82 @@ async function main() {
         if (args.includes('--update')) {
             console.log("🔄 Checking for updates...");
             try {
+                const https = require('https');
+                const fs = require('fs');
+                const path = require('path');
                 const { execSync } = require('child_process');
-                console.log("📦 Updating openbook-cli to latest version...");
-                execSync('npm install -g openbook-cli@latest', { stdio: 'inherit' });
-                console.log("✅ Update completed successfully!");
-                console.log("🔄 Please restart your terminal or run 'openbook-cli --version' to verify.");
-                return;
+                
+                // Get current version
+                let currentVersion = '1.0.9'; // fallback
+                try {
+                    const packageJsonPath = path.join(__dirname, '../package.json');
+                    if (fs.existsSync(packageJsonPath)) {
+                        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+                        currentVersion = packageJson.version;
+                    }
+                } catch (error) {
+                    // Use fallback version
+                }
+                
+                console.log(`📦 Current version: ${currentVersion}`);
+                
+                // Fetch latest release from GitHub
+                const options = {
+                    hostname: 'api.github.com',
+                    path: '/repos/belivenn/openbook-cli/releases/latest',
+                    method: 'GET',
+                    headers: {
+                        'User-Agent': 'openbook-cli-updater'
+                    }
+                };
+                
+                const req = https.request(options, (res: any) => {
+                    let data = '';
+                    
+                    res.on('data', (chunk: any) => {
+                        data += chunk;
+                    });
+                    
+                    res.on('end', () => {
+                        try {
+                            const release = JSON.parse(data);
+                            const latestVersion = release.tag_name.replace('v', '');
+                            
+                            console.log(`📦 Latest version: ${latestVersion}`);
+                            
+                            if (latestVersion === currentVersion) {
+                                console.log("✅ You're already running the latest version!");
+                                return;
+                            }
+                            
+                            console.log("🔄 New version available! Updating...");
+                            
+                            // Install the latest version
+                            execSync(`npm install -g openbook-cli@${latestVersion}`, { stdio: 'inherit' });
+                            
+                            console.log("✅ Update completed successfully!");
+                            console.log(`🔄 Updated from v${currentVersion} to v${latestVersion}`);
+                            console.log("🔄 Please restart your terminal or run 'openbook-cli --version' to verify.");
+                            
+                        } catch (error) {
+                            console.error("❌ Error parsing release data:", error);
+                            console.log("💡 Try running: npm install -g openbook-cli@latest");
+                        }
+                    });
+                });
+                
+                req.on('error', (error: any) => {
+                    console.error("❌ Error checking for updates:", error);
+                    console.log("💡 Try running: npm install -g openbook-cli@latest");
+                });
+                
+                req.end();
+                
             } catch (error) {
                 console.error("❌ Error updating openbook-cli:", error);
                 console.log("💡 Try running: npm install -g openbook-cli@latest");
-                return;
             }
+            return;
         }
         
         // Check if market address is provided
