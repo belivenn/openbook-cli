@@ -24,6 +24,8 @@ function showUsage(): void {
     console.log("  openbook-cli <market_address> --add                 # Add market (auto-detects program)");
     console.log("  openbook-cli --list                                 # List OpenBook markets");
     console.log("  openbook-cli --list --serum                         # List Serum markets");
+    console.log("  openbook-cli --version                              # Show version");
+    console.log("  openbook-cli --update                               # Update to latest version");
     console.log("  openbook-cli --help                                 # Show this help");
     console.log("\nExamples:");
     console.log("  openbook-cli 3ySaxSspDCsEM53zRTfpyr9s9yfq9yNpZFXSEbvbadLf");
@@ -591,6 +593,8 @@ async function main() {
             console.log("  openbook-cli <market_address> --add                 # Add market (auto-detects program)");
             console.log("  openbook-cli --list                                 # List OpenBook markets");
             console.log("  openbook-cli --list --serum                         # List Serum markets");
+            console.log("  openbook-cli --version                              # Show version");
+            console.log("  openbook-cli --update                               # Update to latest version");
             console.log("\nAuto-detection:");
             console.log("  The system automatically detects if a market is OpenBook or Serum");
             console.log("  No need to specify --serum flag for most operations");
@@ -599,6 +603,56 @@ async function main() {
             console.log("  known_openbook_markets.json                         # OpenBook markets");
             console.log("  known_serum_markets.json                            # Serum markets");
             return;
+        }
+
+        // Handle version flag
+        if (args.includes('--version') || args.includes('-v')) {
+            try {
+                const fs = require('fs');
+                const path = require('path');
+                
+                // Try to find package.json in various locations
+                let packageJsonPath = '';
+                const possiblePaths = [
+                    path.join(__dirname, '../package.json'),
+                    path.join(__dirname, '../../package.json'),
+                    path.join(process.cwd(), 'package.json')
+                ];
+                
+                for (const pkgPath of possiblePaths) {
+                    if (fs.existsSync(pkgPath)) {
+                        packageJsonPath = pkgPath;
+                        break;
+                    }
+                }
+                
+                if (packageJsonPath) {
+                    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+                    console.log(`openbook-cli v${packageJson.version}`);
+                } else {
+                    console.log(`openbook-cli v1.0.7`);
+                }
+            } catch (error) {
+                console.log(`openbook-cli v1.0.7`);
+            }
+            return;
+        }
+
+        // Handle update flag
+        if (args.includes('--update')) {
+            console.log("🔄 Checking for updates...");
+            try {
+                const { execSync } = require('child_process');
+                console.log("📦 Updating openbook-cli to latest version...");
+                execSync('npm install -g openbook-cli@latest', { stdio: 'inherit' });
+                console.log("✅ Update completed successfully!");
+                console.log("🔄 Please restart your terminal or run 'openbook-cli --version' to verify.");
+                return;
+            } catch (error) {
+                console.error("❌ Error updating openbook-cli:", error);
+                console.log("💡 Try running: npm install -g openbook-cli@latest");
+                return;
+            }
         }
         
         // Check if market address is provided
