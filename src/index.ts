@@ -630,10 +630,22 @@ async function main() {
                     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
                     console.log(`openbook-cli v${packageJson.version}`);
                 } else {
-                    console.log(`openbook-cli v1.0.7`);
+                    // If we can't find package.json, try to get version from npm
+                    try {
+                        const { execSync } = require('child_process');
+                        const version = execSync('npm list -g openbook-cli --depth=0', { encoding: 'utf8' });
+                        const match = version.match(/openbook-cli@([^\s]+)/);
+                        if (match) {
+                            console.log(`openbook-cli v${match[1]}`);
+                        } else {
+                            console.log('openbook-cli (version unknown)');
+                        }
+                    } catch (error) {
+                        console.log('openbook-cli (version unknown)');
+                    }
                 }
             } catch (error) {
-                console.log(`openbook-cli v1.0.7`);
+                console.log('openbook-cli (version unknown)');
             }
             return;
         }
@@ -647,16 +659,24 @@ async function main() {
                 const path = require('path');
                 const { execSync } = require('child_process');
                 
-                // Get current version
-                let currentVersion = '1.0.9'; // fallback
+                // Get current version dynamically
+                let currentVersion = 'unknown';
                 try {
+                    // First try to get from package.json
                     const packageJsonPath = path.join(__dirname, '../package.json');
                     if (fs.existsSync(packageJsonPath)) {
                         const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
                         currentVersion = packageJson.version;
+                    } else {
+                        // If no package.json, try to get from npm
+                        const version = execSync('npm list -g openbook-cli --depth=0', { encoding: 'utf8' });
+                        const match = version.match(/openbook-cli@([^\s]+)/);
+                        if (match) {
+                            currentVersion = match[1];
+                        }
                     }
                 } catch (error) {
-                    // Use fallback version
+                    // Version will remain 'unknown'
                 }
                 
                 console.log(`📦 Current version: ${currentVersion}`);

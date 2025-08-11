@@ -1,6 +1,6 @@
 {
   "name": "openbook-cli",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A comprehensive CLI tool for interacting with OpenBook and Serum DEX markets on Solana",
   "main": "dist/index.js",
   "bin": {
@@ -13,7 +13,7 @@
     "openbook": "ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "npm publish",
-    "publish:test": "echo 'Would publish openbook-cli@1.0.7 to npm registry'"
+    "publish:test": "echo 'Would publish openbook-cli@1.1.0 to npm registry'"
   },
   "keywords": [
     "openbook",
